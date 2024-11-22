@@ -6,10 +6,10 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { updateProfile } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/redux/slices/userSlice";
+import { USER_AVATAR } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
@@ -20,7 +20,7 @@ const Login = () => {
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
-  const navigate = useNavigate();
+
   const dispatch = useDispatch();
   const handleButtonClick = () => {
     // validate the form data
@@ -41,7 +41,7 @@ const Login = () => {
     if (!isSignInForm) {
       //Sign up logic
       // once you called thi api, it will create a user on firebase and gives you response. If response is success, it will give a user object and it will sign in the user automatically. And if there is an erro in the API, it will go into the catch block. Whenever a yuser sign sup, firebase creates an access token and gives it to us. This is the accessToken it will use to authenticate the user. It will also gives a userId (uid)
-      // Once the user sign in or sign up, I will add that user to the redux store and will navigate the user to my browse page
+      // Once the user sign in or sign up, I will add that user to the redux store and will  the user to my browse page
       // as soon as the user signs in or signs up, i want to update the userSlice with the user Info
       // instaed of dispatching actions here an there, we will use a utility given to us by firebase known as onAuthStateChanged. This API is called whenever the user signs in / signs up / signs out,,, whenever some authentication happens,,, whenever there is an authentication state change,,, suppose if you create a user or signs in a user,,, If you want to do something on the auth change then use this API. This is kind of a event listener. If the user signs in / signs up/ signs out, this will be called automatically. I will add this in the app and I will do state changes within it.
 
@@ -57,7 +57,7 @@ const Login = () => {
           // as soon as a new user is successfully registered, update the profile with the name and photo URL
           updateProfile(user, {
             displayName: name.current.value,
-            photoURL: "https://avatars.githubusercontent.com/u/12824231?v=4",
+            photoURL: USER_AVATAR,
           })
             .then(() => {
               // user is created with email and password, once it is successful we will update profile with displayName and photoURL. After that, we will update the store once again
@@ -73,7 +73,6 @@ const Login = () => {
                 })
               );
               // Profile updated!
-              navigate("/browse");
             })
             .catch((error) => {
               // An error occurred
@@ -95,9 +94,6 @@ const Login = () => {
         .then((userCredential) => {
           //signed in
           const user = userCredential.user;
-          console.log(user);
-          // If the user signs out, then navigate him to the main page
-          navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -194,3 +190,10 @@ export default Login;
 // in this project
 // app => app level
 // body => root level
+/*  
+If the user is not logged in (if the user access token is not there), and he is trying to access the
+browse page (by typing url), we should not direct him to the browse page instead we should redirect him to the login page. We can acheive this functionality only if we check the auth on the browse page.
+
+If the user is logged in (he is on the browse page) and he again goes to the login page(by typing the URL), redirect him to the browse page
+
+*/

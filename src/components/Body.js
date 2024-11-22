@@ -1,32 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Browse from "./Browse";
 import Login from "./Login";
-import { useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../utils/firebase";
-import { useDispatch } from "react-redux";
-import { addUser, removeUser } from "../utils/redux/slices/userSlice";
-
 
 const Body = () => {
-  // i want to setup this only once thats why i have written this inside useEffect hook
-  useEffect(() => {
-    // if the user sign in/ signs out/ signs up , in all the cases this will be called. All the updates in the store can be done form one place. Otherwise we have to write all this logic at random places. I want to all this from one place
-    onAuthStateChanged(auth, (user) => {
-      // if the user is signed in / signs up then i will get the user over here
-      if (user) {
-        // User is signed in / the user signs up
-        const { uid, email, displayName, photoURL } = user;
-        // now update the user, put all this to the store
-        dispatch(addUser({ uid: uid, email: email, displayName: displayName , photoURL: photoURL}));
-      } else {
-        // User is signed out
-        dispatch(removeUser());
-      }
-    });
-  }, []);
-  const dispatch = useDispatch();
- 
+  
+
   const appRoute = createBrowserRouter([
     {
       path: "/",
@@ -45,3 +23,4 @@ const Body = () => {
 };
 
 export default Body;
+// body is the parent component and routing is happening inside the body component. Whenever we have to navigate, we can only navigate inside the children of the RouterProvider. Navigate will only work inside the appRoute routes. Navigate function will only work for example: inside Login and all the children of Login ........ So i will use the useEffect inside the routerProvider and in a central place which is always there. So the best place is header component. Header will always be present on my website
